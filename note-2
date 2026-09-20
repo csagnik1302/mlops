@@ -1,0 +1,15 @@
+That's a useful finding, and a bit counterintuitive — worth spelling out clearly.
+
+**What you'd expect:** the model tuned on macro recall should have the higher macro recall, and the model tuned on macro F1 should have the higher macro F1. Optuna is directly optimizing whichever objective you gave it, so each model should win on its own turf at minimum.
+
+**What actually happened:** Model 1 (F1-optimized) beats Model 2 (recall-optimized) on *both* metrics — macro F1 (0.769 vs 0.764) *and* macro recall (0.775 vs 0.771). The recall-tuned model doesn't even win on recall, which is the one thing it was told to chase.
+
+**What this tells you:**
+
+1. **The recall-optimized search likely got stuck in a shallower or different optimum**, not a genuinely different trade-off. If it had found a real precision/recall trade-off, you'd expect to see Model 2 sacrifice precision for higher recall — but it doesn't have higher recall either, so it's not that it "spent" precision to buy recall. It's just closer to Model 1's cost of predicting everything as class 4.
+
+2. **Look at class 4 in both**: recall is ~0.99 in both models, virtually identical, while precision sits around 0.68 for both. That's the classic signature of a model leaning hard on one class to inflate recall — likely the majority "at risk" or "churn" class. Optimizing for recall alone doesn't necessarily push the model further in a useful direction if it's already near-saturated on the class that's easiest to catch; there wasn't much room left for the recall objective to meaningfully differentiate the search from the F1 objective.
+
+3. **Class 3 recall dropped further under the recall-tuned model** (0.523 vs 0.547) — the class that most needs improvement got *worse*, even under a recall-focused search. That's the strongest evidence the recall-only objective isn't actually solving your hardest problem; it may be a noisier objective for Optuna's trial-and-error search to climb, since macro recall alone gives no signal about false positives, so the search can wander into regions that don't consistently help the minority classes.
+
+**Practical takeaway:** this is decent empirical confirmation that macro F1 is the better tuning objective for you going forward — not just theoretically (per the rubric), but demonstrably, since even a search explicitly told to maximize recall failed to beat the F1-tuned model on recall itself. I'd retire the recall-scorer path and standardize on macro F1 for future tuning runs, and if you want to double check this wasn't a fluke of `n_trials` or search variance, rerunning both with a higher trial budget (or the same `random_state` seed on the Optuna sampler) would help confirm it's a stable result rather than noise in a fairly small search.

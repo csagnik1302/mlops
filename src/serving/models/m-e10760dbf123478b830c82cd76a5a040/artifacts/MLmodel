@@ -1,0 +1,64 @@
+artifact_path: file:./mlruns/0/models/m-e10760dbf123478b830c82cd76a5a040/artifacts
+flavors:
+  python_function:
+    data: model.ubj
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.xgboost
+    python_version: 3.12.10
+  xgboost:
+    code: null
+    data: model.ubj
+    model_class: xgboost.sklearn.XGBClassifier
+    model_format: ubj
+    xgb_version: 3.4.1
+is_signature_from_type_hint: false
+mlflow_version: 3.16.1
+model_id: m-e10760dbf123478b830c82cd76a5a040
+model_size_bytes: 1208467
+model_uuid: m-e10760dbf123478b830c82cd76a5a040
+prompts: null
+run_id: d555cbff3da044268a144fa0851bd63f
+signature:
+  inputs: '[{"type": "double", "name": "age", "required": true}, {"type": "double",
+    "name": "days_since_last_login", "required": true}, {"type": "double", "name":
+    "avg_time_spent_in_seconds", "required": true}, {"type": "double", "name": "avg_transaction_value",
+    "required": true}, {"type": "double", "name": "avg_frequency_login_days", "required":
+    true}, {"type": "double", "name": "points_in_wallet", "required": true}, {"type":
+    "double", "name": "days_since_joined", "required": true}, {"type": "double", "name":
+    "gender_M", "required": true}, {"type": "double", "name": "gender_Unknown", "required":
+    true}, {"type": "double", "name": "region_category_Town", "required": true}, {"type":
+    "double", "name": "region_category_Unknown", "required": true}, {"type": "double",
+    "name": "region_category_Village", "required": true}, {"type": "double", "name":
+    "membership_category_Gold Membership", "required": true}, {"type": "double", "name":
+    "membership_category_No Membership", "required": true}, {"type": "double", "name":
+    "membership_category_Platinum Membership", "required": true}, {"type": "double",
+    "name": "membership_category_Premium Membership", "required": true}, {"type":
+    "double", "name": "membership_category_Silver Membership", "required": true},
+    {"type": "double", "name": "joined_through_referral_No", "required": true}, {"type":
+    "double", "name": "joined_through_referral_Yes", "required": true}, {"type": "double",
+    "name": "preferred_offer_types_Gift Vouchers/Coupons", "required": true}, {"type":
+    "double", "name": "preferred_offer_types_Without Offers", "required": true}, {"type":
+    "double", "name": "medium_of_operation_Both", "required": true}, {"type": "double",
+    "name": "medium_of_operation_Desktop", "required": true}, {"type": "double", "name":
+    "medium_of_operation_Smartphone", "required": true}, {"type": "double", "name":
+    "internet_option_Mobile_Data", "required": true}, {"type": "double", "name": "internet_option_Wi-Fi",
+    "required": true}, {"type": "double", "name": "used_special_discount_Yes", "required":
+    true}, {"type": "double", "name": "offer_application_preference_Yes", "required":
+    true}, {"type": "double", "name": "past_complaint_Yes", "required": true}, {"type":
+    "double", "name": "complaint_status_Solved", "required": true}, {"type": "double",
+    "name": "complaint_status_Solved in Follow-up", "required": true}, {"type": "double",
+    "name": "complaint_status_Unsolved", "required": true}, {"type": "double", "name":
+    "feedback_Poor Customer Service", "required": true}, {"type": "double", "name":
+    "feedback_Poor Product Quality", "required": true}, {"type": "double", "name":
+    "feedback_Poor Website", "required": true}, {"type": "double", "name": "feedback_Products
+    always in Stock", "required": true}, {"type": "double", "name": "feedback_Quality
+    Customer Care", "required": true}, {"type": "double", "name": "feedback_Reasonable
+    Price", "required": true}, {"type": "double", "name": "feedback_Too many ads",
+    "required": true}, {"type": "double", "name": "feedback_User Friendly Website",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "int64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2026-09-19 21:16:00.965478'

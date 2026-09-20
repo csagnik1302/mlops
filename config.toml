@@ -1,0 +1,6 @@
+[preprocess]
+test_size=0.1
+multicoll_corr_threshold=0.9
+
+[random_state]
+random_state=42

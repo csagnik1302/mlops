@@ -1,0 +1,39 @@
+Given those two goals, use **Macro-averaged F1** as the Optuna optimization objective, but don't rely on it alone — pull the other four in as reporting/diagnostic metrics, since none of them alone captures both "retain loyal customers" and "predict churn accurately."
+
+**Why Macro F1 as the tuning target:**
+
+- Optuna needs one scalar to optimize against. Macro F1 is the only metric in this list that balances precision and recall *simultaneously* per class, which matters because your two goals actually pull in different directions:
+ - "Accurate churn prediction" → wants high recall on the churn class (catch everyone who's leaving)
+ - "Loyal customer retention" → implicitly wants high precision too (don't waste retention budget/spam loyal customers with unnecessary offers, and don't misclassify loyal customers as churners)
+- Optimizing recall alone (what you had before) would happily sacrifice precision — meaning the model could flag lots of loyal customers as "at risk" just to catch more true churners. Macro F1 penalizes that.
+- It's macro, not weighted, so the churn class (presumably the minority) doesn't get drowned out by the majority "still active/loyal" class — matches your rubric's imbalance concern directly.
+
+**What to layer on top, after tuning:**
+
+1. **Class-specific recall on the churn class** — report this separately post-hoc. This directly answers "did we miss churners?" Macro F1 can look fine while churn-class recall is mediocre if precision compensates, so check this explicitly rather than trusting the aggregate.
+2. **Class-specific precision on the churn class** — answers "are our retention offers well-targeted, or wasted on false positives?" Directly relevant to loyal-customer cost.
+3. **Confusion matrix** — run this once per tuned model, not per trial. This is where you'll actually see if the model confuses "downgrade" with "complete churn" (if you have multiple churn severity classes) — Optuna can't optimize against this since it's not a scalar, but it's essential for the final sanity check.
+4. **Cohen's Kappa** — nice single-number sanity check to report alongside the F1 score, useful mainly for communicating "how much better than random guessing" to stakeholders. Not something to optimize against; more of a summary stat once you've picked a final model.
+
+So concretely, in your `run_optuna` function:
+
+```python
+f1_scorer = make_scorer(f1_score, average='macro')
+# use this in OptunaSearchCV(scoring=f1_scorer, ...)
+```
+
+Then after `optuna_search.fit(...)`, in addition to `classification_report` (which already gives you per-class precision/recall/F1), explicitly compute and save the confusion matrix:
+
+```python
+from sklearn.metrics import confusion_matrix
+cm = confusion_matrix(test_label, test_pred)
+pd.DataFrame(cm).to_csv(PATH_MODEL_PF/f"{model_name_for_export}_confusion_matrix.csv")
+```
+
+That gives you: Macro F1 driving the search, and the confusion matrix + per-class precision/recall (already in your `classification_report` output) for the human-readable diagnosis your rubric is asking for.
+
+
+
+
+
+MetricWhy it's ImportantBest Used For...Macro-averaged F1-ScoreTreats all classes equally. It calculates the F1-score for each class independently and takes the unweighted average.High data imbalance. It ensures your model performs well on the rare churn classes, not just the majority "active" class.Confusion MatrixProvides a complete breakdown of actual vs. predicted classes.Visualizing exactly where the model is misclassifying (e.g., confusing a high-value downgrade with a complete churn).Class-Specific Recall (Sensitivity)Measures the model's ability to find all the customers who will actually churn into a specific category.Proactive retention campaigns where missing a churning customer costs more than sending an incentive to someone who might stay.Class-Specific PrecisionMeasures how many of the predicted churners actually end up churning.Expensive retention offers (like large discounts) where you cannot afford to waste budget on false positives.Cohen’s KappaCompares the model's performance against random guessing, factoring in class imbalance.Getting a single, robust baseline score for overall model relia

@@ -8,10 +8,20 @@ authors = [
 ]
 requires-python = ">=3.12"
 dependencies = [
+    "catboost>=1.2.10",
+    "fastapi>=0.141.1",
     "ipykernel>=7.3.0",
+    "lightgbm>=4.7.0",
     "matplotlib>=3.11.2",
+    "mlflow>=3.16.1",
+    "optuna>=5.0.0",
+    "optuna-integration[sklearn]>=5.0.0",
     "pandas>=3.0.5",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
     "seaborn>=0.13.2",
+    "uvicorn>=0.53.0",
+    "xgboost>=3.4.1",
 ]
 
 [project.scripts]
